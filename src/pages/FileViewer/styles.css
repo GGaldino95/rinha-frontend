@@ -1,0 +1,78 @@
+:root {
+  --entry-level: 0; /* Define a CSS variable with an initial value */
+}
+
+.file-viewer-page-container {
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: flex-start;
+  justify-content: flex-start;
+  align-self: flex-start;
+  min-width: 50%;
+  height: 100%;
+  margin: 0 auto;
+  padding: 1.5rem 2.88rem;
+}
+
+.file-viewer-page-title {
+  color: #000;
+  font-family: Inter;
+  font-size: 2rem;
+  font-style: normal;
+  font-weight: 700;
+  line-height: normal;
+  margin: 0 0 0.62rem;
+}
+
+.file-viewer-page-json-content {
+  display: flex;
+  flex-flow: column nowrap;
+}
+
+.obj-entry {
+  display: flex;
+  flex-flow: row nowrap;
+}
+
+.obj-key {
+  color: #4e9590;
+  font-family: Inter;
+  font-size: 1rem;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 1.76525rem;
+  white-space: pre-wrap;
+}
+
+.obj-value {
+  color: #000;
+  font-family: Inter;
+  font-size: 1rem;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 1.76525rem;
+}
+
+.obj-bracket {
+  color: #f2cab8;
+  font-family: Inter;
+  font-size: 1rem;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 1.76525rem;
+}
+
+.obj-index {
+  color: #bfbfbf;
+  font-family: Inter;
+  font-size: 1rem;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 176.523%;
+  white-space: pre-wrap;
+}
+
+.sub-obj {
+  border-left: 1px solid #bfbfbf;
+  padding-left: 1rem;
+}
