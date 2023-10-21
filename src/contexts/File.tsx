@@ -1,6 +1,7 @@
 import React, { createContext, useState, type Dispatch, type SetStateAction } from 'react';
+import { LargeObject } from '../utils';
 
-type TFile = object | null;
+type TFile = object | LargeObject | null;
 
 type FileContextType = {
   file: TFile;

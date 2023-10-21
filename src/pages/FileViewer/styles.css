@@ -14,6 +14,25 @@
   padding: 1.5rem 2.88rem;
 }
 
+.file-viewer-page-title-wrapper {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+}
+
+.file-viewer-page-return-button {
+  background-color: transparent;
+  border: none;
+  outline: none;
+  padding: 0;
+  margin: 0 0.5rem 0 0;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+.file-viewer-page-return-button i {
+  font-size: 2rem;
+}
+
 .file-viewer-page-title {
   color: #000;
   font-family: Inter;

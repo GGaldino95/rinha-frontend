@@ -1,121 +1,64 @@
-import { useContext, useLayoutEffect } from 'react';
+import { useContext, useLayoutEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { ArrayEntry, ObjectEntry, PrimitiveEntry } from '../../components';
 import { FileContext } from '../../contexts/File';
-import { chunkArray, isObject } from '../../utils';
+import { LargeObject, isObject, renderLargeObjectLazy } from '../../utils';
 import './styles.css';
 
 export const FileViewer = () => {
   const navigate = useNavigate();
   const { state } = useLocation();
   const { file } = useContext(FileContext);
+  const [jsonFile, setJsonFile] = useState<object | null>(null);
+  console.log('jsonFile', jsonFile);
 
   useLayoutEffect(() => {
+    const updateCallback = (chunk: LargeObject) => {
+      // Update the state with the next chunk
+      setJsonFile(prevObject => ({ ...prevObject, ...chunk }));
+    };
+
+    console.log('file', file, 'state', state);
     if (!file || !state?.fileName) {
+      console.log('redirect to home')
       navigate('/');
+      window.location.assign('/')
     } else {
-      const contentContainer = document.querySelector('#json-file') as HTMLDivElement;
-
-      const generateEntry = (object: object, subEntryLevel: number, parentEl: Element) => {
-        Object.entries(object).forEach(([key, value], index) => {
-          const entryEl = document.createElement('section');
-          entryEl.classList.add('obj-entry');
-
-          const isPrevEntryArray = parentEl.previousElementSibling?.getAttribute('type') === 'array';
-
-          if (isPrevEntryArray) {
-            const indexEl = document.createElement('span');
-            indexEl.classList.add('obj-index');
-            indexEl.textContent = `${index}: `;
-            entryEl.appendChild(indexEl);
-          } else {
-            const keyEl = document.createElement('span');
-            keyEl.classList.add('obj-key');
-            keyEl.textContent = `${key}: `;
-            entryEl.appendChild(keyEl);
-          }
-
-          const valueEl = document.createElement('span');
-
-          if (Array.isArray(value)) {
-            entryEl.setAttribute('type', 'array');
-            valueEl.classList.add('obj-bracket');
-            valueEl.textContent = '[';
-
-            const subArrayContainer = document.createElement('section');
-            subArrayContainer.classList.add('sub-obj');
-
-            entryEl.appendChild(valueEl);
-            parentEl.appendChild(entryEl);
-            parentEl.appendChild(subArrayContainer);
-
-            console.log('array value', value);
-            if (value.length > 100) {
-              const chunks = chunkArray(value, 100);
-
-              chunks.forEach((chunk) => {
-                setTimeout(() => {
-                  generateEntry(chunk, subEntryLevel + 1, subArrayContainer);
-                }, 100);
-              });
-            } else {
-              generateEntry(value, subEntryLevel + 1, subArrayContainer);
-            }
-
-            const closingArrayEntry = document.createElement('span');
-            closingArrayEntry.classList.add('obj-bracket');
-            closingArrayEntry.textContent = ']';
-
-            parentEl.appendChild(closingArrayEntry);
-          } else if (isObject(value)) {
-            entryEl.setAttribute('type', 'object');
-            valueEl.classList.add('obj-bracket');
-            valueEl.textContent = '{';
-
-            const subObjContainer = document.createElement('section');
-            subObjContainer.classList.add('sub-obj');
-
-            parentEl.appendChild(entryEl);
-            parentEl.appendChild(subObjContainer);
-
-            generateEntry(value, subEntryLevel + 1, subObjContainer);
-
-            if (!isPrevEntryArray) {
-              const closingObjectEntry = document.createElement('span');
-              closingObjectEntry.classList.add('obj-bracket');
-              closingObjectEntry.textContent = '}';
-
-              entryEl.appendChild(valueEl);
-              parentEl.appendChild(closingObjectEntry);
-            }
-          } else {
-            entryEl.setAttribute('type', 'primitive');
-            valueEl.classList.add('obj-value');
-            valueEl.textContent = typeof value === 'string' ? `"${value}"` : value;
-
-            entryEl.appendChild(valueEl);
-            parentEl.appendChild(entryEl);
-          }
-
-          entryEl.setAttribute('entry-level', String(subEntryLevel));
-        })
-      };
-
-      console.log('selected file', file);
-
-      generateEntry(file, 0, contentContainer);
+      renderLargeObjectLazy(file, 50, updateCallback);
     }
 
     return () => {
       const contentContainer = document.querySelector('.file-viewer-page-json-content');
       contentContainer?.replaceChildren();
     }
-  }, [])
+  }, [file, navigate]);
+
+  const handleReturn = () => {
+    navigate('/');
+  }
 
   return (
     <main className="file-viewer-page-container">
-      <h1 className="file-viewer-page-title">{state.fileName}</h1>
+      <article className="file-viewer-page-title-wrapper">
+        <button type="button" className="file-viewer-page-return-button" onClick={handleReturn}>
+          <i className="material-icons-round">
+            arrow_back
+          </i>
+        </button>
+        <h1 className="file-viewer-page-title">{state.fileName}</h1>
+      </article>
 
-      <section id="json-file" className="file-viewer-page-json-content" />
+      <section id="json-file" className="file-viewer-page-json-content">
+        {jsonFile && Object.entries(jsonFile).map(([key, value], index) => {
+          if (Array.isArray(value)) {
+            return <ArrayEntry key={`array-entry-${index + 1}`} entry={{ key, value }} type="array" />
+          } else if (isObject(value)) {
+            return <ObjectEntry key={`object-entry-${index + 1}`} entry={{ key, value }} type="object" />
+          } else {
+            return <PrimitiveEntry key={`primitive-entry-${index + 1}`} entry={{ key, value }} type="primitive" />
+          }
+        })}
+      </section>
     </main>
   );
 };

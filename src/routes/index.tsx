@@ -1,9 +1,8 @@
-import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
+import { HashRouter as BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { ContextStore } from '../contexts';
 import { FileViewer, Home } from '../pages';
 
 export const AppRouter = () => {
-
   return (
     <ContextStore>
       <BrowserRouter>
